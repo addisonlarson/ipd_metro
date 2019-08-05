@@ -444,14 +444,11 @@ all_cty <- map(st, ~{counties(state = .x,
   st_transform(., 102003) %>%
   select(GEOID) %>%
   left_join(., export_means_cty, by = c("GEOID" = "stcty")) %>%
-  rename(GEOID10 = GEOID)
+  rename(GEOID10 = GEOID) %>%
+  group_by(GEOID10) %>%
+  slice(., 1)
 all_cty <- drop_na(all_cty)
-all_st <- states(cb = FALSE, year = ipd_year) %>%
-  select(GEOID, NAME) %>%
-  filter(!(GEOID %in% c("02", "15", "60", "66", "69", "72", "78"))) %>%
-  st_transform(., 102003)
 st_write(all_cty, here("outputs", "ipd.shp"), delete_dsn = TRUE, quiet = TRUE)
-st_write(all_st, here("outputs", "states.shp"), delete_dsn = TRUE, quiet = TRUE)
 write_csv(ipd, here("outputs", "ipd.csv"))
 write_csv(export_means_metro, here("outputs", "mean_by_metro.csv"))
 write_csv(export_means_cty, here("outputs", "mean_by_county.csv"))
